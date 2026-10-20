@@ -23,7 +23,9 @@ function DocViewer({ label, doc }) {
   const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(doc.name || "") || /\.(jpg|jpeg|png|gif|webp)$/i.test(doc.url || "");
   const isPdf = /\.pdf$/i.test(doc.name || "") || /\.pdf$/i.test(doc.url || "");
 
-  const baseUrl = (typeof process !== "undefined" && process.env.VITE_API_URL) || "http://localhost:4000";
+  const baseUrl = import.meta.env.VITE_API_URL
+    ? import.meta.env.VITE_API_URL.replace(/\/api\/?$/, "")
+    : "";
   const fileUrl = doc.url?.startsWith("/uploads/")
     ? `${baseUrl}${doc.url}`
     : doc.url;
