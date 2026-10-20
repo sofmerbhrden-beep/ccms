@@ -594,6 +594,7 @@ export async function createCertificate(req, res, next) {
       }
     } catch (pdfErr) {
       console.error("PDF generation failed:", pdfErr);
+      throw new Error(`PDF generation failed: ${pdfErr instanceof Error ? pdfErr.message : String(pdfErr)}`);
     }
 
     await app.save();
@@ -720,6 +721,11 @@ export async function sendCertificateEmail(req, res, next) {
         ? app.certificate.history.toObject()
         : app.certificate?.history || {};
       pdfPath = histObj[String(latestYear)]?.pdfPath || app.certificate?.pdfPath;
+      if (!pdfPath) {
+        return res
+          .status(500)
+          .json({ message: `PDF generation failed: ${genErr instanceof Error ? genErr.message : String(genErr)}` });
+      }
     }
 
     if (!pdfPath) {
