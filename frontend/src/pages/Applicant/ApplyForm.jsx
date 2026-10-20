@@ -174,11 +174,31 @@ export default function ApplyForm() {
   const [serviceTypeId, setServiceTypeId] = useState("");
 
   const [serviceTypes, setServiceTypes] = useState([]);
+  const [serviceTypesLoading, setServiceTypesLoading] = useState(true);
   useEffect(() => {
+    let cancelled = false;
     api
       .serviceTypes()
-      .then((collection) => setServiceTypes(collection.items))
-      .catch(() => setServiceTypes([]));
+      .then((collection) => {
+        if (!cancelled) {
+          const items = collection && Array.isArray(collection.items)
+            ? collection.items
+            : [];
+          setServiceTypes(items);
+          setServiceTypesLoading(false);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          console.error("Failed to load service types", err);
+          setServiceTypes([]);
+          setServiceTypesLoading(false);
+          toast.error("Couldn't load service types. Please try again.");
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const [photo, setPhoto] = useState(null);
