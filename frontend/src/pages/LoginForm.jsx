@@ -26,16 +26,10 @@ const itemVariants = {
   visible: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 350, damping: 26 } },
 };
 
-const demoAccounts = [
-  { role: "applicant", label: "Applicant" },
-  { role: "staff", label: "Staff" },
-  { role: "admin", label: "Admin" },
-];
-
 export default function LoginForm() {
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const { login, loginDemo } = useAuth();
+  const { login } = useAuth();
   const location = useLocation();
   const [email, setEmail] = useState(location.state?.email || "");
   const [password, setPassword] = useState("");
@@ -64,20 +58,6 @@ export default function LoginForm() {
   async function handleSubmit(e) {
     e.preventDefault();
     await submitLogin(email, password);
-  }
-
-  async function handleDemoLogin(role) {
-    setError("");
-    setSuccessMsg("");
-    setSubmitting(true);
-    try {
-      const user = await loginDemo(role);
-      navigate(HOME_BY_ROLE[user.role] || "/applicant/dashboard");
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setSubmitting(false);
-    }
   }
 
   return (
@@ -212,32 +192,6 @@ export default function LoginForm() {
                 </button>
               </motion.div>
             </form>
-
-            <motion.section
-              variants={itemVariants}
-              aria-label="Demo accounts"
-              className="mt-5 border-t border-gray-100 pt-4"
-            >
-              <p className="mb-3 text-center text-xs font-semibold text-gray-600">
-                Try a demo account
-              </p>
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                {demoAccounts.map((account) => (
-                  <button
-                    key={account.role}
-                    type="button"
-                    disabled={submitting}
-                    onClick={() => handleDemoLogin(account.role)}
-                    className="rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-bold text-[#245b7a] transition-colors hover:bg-sky-100 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    Demo {account.label}
-                  </button>
-                ))}
-              </div>
-              <p className="mt-2 text-center text-[10px] leading-relaxed text-amber-700">
-                  Demo access is public. Do not use these accounts with real or sensitive data.
-              </p>
-            </motion.section>
 
             <motion.div variants={itemVariants} className="mt-6 border-t border-gray-100 pt-4 text-center">
               <p className="text-gray-500 text-xs font-medium">
