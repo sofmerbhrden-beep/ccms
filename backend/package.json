@@ -12,7 +12,7 @@
     "start": "node server.js",
     "seed": "node utils/seed.js",
     "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
-    "postinstall": ""
+    "postinstall": "puppeteer browsers install chrome"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1108.0",

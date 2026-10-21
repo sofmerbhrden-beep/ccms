@@ -741,33 +741,12 @@ export async function sendCertificateEmail(req, res, next) {
       return res.status(409).json({ message: "PDF file not found on server" });
     const pdfBuffer = fs.readFileSync(localPath);
 
-    const { getTransporter, wrap } = await import("../utils/mailer.js");
-    const refSlug = app.certificate.referenceNumber.replace("/", "-");
-
-    await getTransporter().sendMail({
-      from: `"Butajira CCMS" <${process.env.SMTP_USER}>`,
+    const { sendCertificateEmailNotification } = await import("../utils/mailer.js");
+    await sendCertificateEmailNotification({
       to: applicantEmail,
-      subject: "Your Competency Certificate - Butajira CCMS",
-      html: wrap(`
-        <h2 style="margin:0 0 8px;font-size:20px;font-weight:800;color:#0F172A;">Hello ${app.applicantInfo.fullName},</h2>
-        <div style="display:inline-block;padding:4px 12px;background-color:#F0FDF4;color:#166534;font-size:12px;font-weight:700;border-radius:20px;margin-bottom:20px;">
-          Certificate Issued
-        </div>
-        <p style="font-size:14px;color:#334155;margin:0 0 12px;line-height:1.6;">
-          Your official competency certificate has been issued and is attached to this email.
-        </p>
-        <div style="text-align:center;margin:20px 0;">
-          <span style="font-family:'Courier New', Courier, monospace;font-size:16px;font-weight:700;color:#1B2A4A;background:#E2E8F0;padding:8px 16px;border-radius:6px;letter-spacing:1px;">
-            Reference No: ${app.certificate.referenceNumber}
-          </span>
-        </div>
-        <p style="font-size:13px;color:#64748B;margin:16px 0 0;text-align:center;">
-          Please find your official PDF certificate attached to this email.
-        </p>
-      `),
-      attachments: [
-        { filename: `certificate-${refSlug}.pdf`, content: pdfBuffer },
-      ],
+      applicantName: app.applicantInfo?.fullName || "Applicant",
+      referenceNumber: app.certificate.referenceNumber,
+      pdfBuffer,
     });
 
     res.json({ message: "Certificate sent to " + applicantEmail });

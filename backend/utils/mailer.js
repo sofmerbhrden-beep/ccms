@@ -97,20 +97,29 @@ export function wrap(content) {
 </html>`;
 }
 
-async function send(to, subject, html) {
+export async function send(to, subject, html, attachments = []) {
   if (process.env.RESEND_API_KEY) {
+    const payload = {
+      from: process.env.RESEND_FROM || "Butajira CCMS <onboarding@resend.dev>",
+      to: Array.isArray(to) ? to : [to],
+      subject,
+      html,
+    };
+
+    if (Array.isArray(attachments) && attachments.length > 0) {
+      payload.attachments = attachments.map((att) => ({
+        filename: att.filename,
+        content: Buffer.isBuffer(att.content) ? att.content.toString("base64") : String(att.content),
+      }));
+    }
+
     const response = await fetch(`${resendApiUrl}/emails`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        from: process.env.RESEND_FROM || "Butajira CCMS <onboarding@resend.dev>",
-        to,
-        subject,
-        html,
-      }),
+      body: JSON.stringify(payload),
     });
     if (!response.ok) {
       const details = await response.text();
@@ -124,6 +133,7 @@ async function send(to, subject, html) {
     to,
     subject,
     html,
+    attachments,
   });
 }
 
@@ -242,3 +252,40 @@ export async function sendStatusEmail(
     `),
   );
 }
+
+export async function sendCertificateEmailNotification({
+  to,
+  applicantName,
+  referenceNumber,
+  pdfBuffer,
+}) {
+  const refSlug = String(referenceNumber || "cert").replace("/", "-");
+  await send(
+    to,
+    "Your Competency Certificate - Butajira CCMS",
+    wrap(`
+      <h2 style="margin:0 0 8px;font-size:20px;font-weight:800;color:#0F172A;">Hello ${applicantName},</h2>
+      <div style="display:inline-block;padding:4px 12px;background-color:#F0FDF4;color:#166534;font-size:12px;font-weight:700;border-radius:20px;margin-bottom:20px;">
+        Certificate Issued
+      </div>
+      <p style="font-size:14px;color:#334155;margin:0 0 12px;line-height:1.6;">
+        Your official competency certificate has been issued and is attached to this email.
+      </p>
+      <div style="text-align:center;margin:20px 0;">
+        <span style="font-family:'Courier New', Courier, monospace;font-size:16px;font-weight:700;color:#1B2A4A;background:#E2E8F0;padding:8px 16px;border-radius:6px;letter-spacing:1px;">
+          Reference No: ${referenceNumber}
+        </span>
+      </div>
+      <p style="font-size:13px;color:#64748B;margin:16px 0 0;text-align:center;">
+        Please find your official PDF certificate attached to this email.
+      </p>
+    `),
+    [
+      {
+        filename: `certificate-${refSlug}.pdf`,
+        content: pdfBuffer,
+      },
+    ],
+  );
+}
+

@@ -53,7 +53,12 @@ function resolvePuppeteerExecutablePath() {
   } catch {}
 
   const homeDir = process.env.HOME || process.env.USERPROFILE || "";
-  const cacheRoot = path.join(homeDir, ".cache", "puppeteer");
+  const cacheRoots = [
+    path.join(__dirname, "../.cache/puppeteer"),
+    path.join(__dirname, "../../.cache/puppeteer"),
+    path.join(homeDir, ".cache", "puppeteer"),
+    "/opt/render/.cache/puppeteer",
+  ];
   const isWin = process.platform === "win32";
 
   const browserCandidates = [
@@ -69,15 +74,18 @@ function resolvePuppeteerExecutablePath() {
     },
   ];
 
-  for (const candidate of browserCandidates) {
-    const browserRoot = path.join(cacheRoot, candidate.folder);
-    if (!fs.existsSync(browserRoot)) continue;
+  for (const cacheRoot of cacheRoots) {
+    if (!fs.existsSync(cacheRoot)) continue;
+    for (const candidate of browserCandidates) {
+      const browserRoot = path.join(cacheRoot, candidate.folder);
+      if (!fs.existsSync(browserRoot)) continue;
 
-    const browserVersions = fs.readdirSync(browserRoot, { withFileTypes: true }).filter((entry) => entry.isDirectory());
-    for (const versionEntry of browserVersions) {
-      const executablePath = path.join(browserRoot, versionEntry.name, candidate.binaryFolder, candidate.binaryName);
-      if (fs.existsSync(executablePath)) {
-        return executablePath;
+      const browserVersions = fs.readdirSync(browserRoot, { withFileTypes: true }).filter((entry) => entry.isDirectory());
+      for (const versionEntry of browserVersions) {
+        const executablePath = path.join(browserRoot, versionEntry.name, candidate.binaryFolder, candidate.binaryName);
+        if (fs.existsSync(executablePath)) {
+          return executablePath;
+        }
       }
     }
   }

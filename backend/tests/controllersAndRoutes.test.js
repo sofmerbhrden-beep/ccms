@@ -21,6 +21,8 @@ jest.unstable_mockModule("../utils/mailer.js", () => ({
   sendTempPasswordEmail: jest.fn().mockResolvedValue(true),
   sendStatusEmail: jest.fn().mockResolvedValue(true),
   verifyMailer: jest.fn().mockResolvedValue(true),
+  sendCertificateEmailNotification: jest.fn().mockResolvedValue(true),
+  send: jest.fn().mockResolvedValue(true),
 }));
 
 // Mock Token
