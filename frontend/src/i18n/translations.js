@@ -252,8 +252,8 @@ export const translations = {
     generateCertificate: "Generate certificate",
     certIssuedHeading: "Certificate issued",
     viewPrintCertificate: "View / print certificate",
-    certSentToUser: "Certificate sent to user",
-    certSentToUserHint: "The certificate was automatically sent to the applicant's email upon approval.",
+    certSentToUser: "Certificate directed to user",
+    certSentToUserHint: "The certificate is now available on the applicant's dashboard.",
 
 
     tab_account: "Account",
@@ -574,8 +574,8 @@ export const translations = {
     generateCertificate: "የምስክር ወረቀት አመንጭ",
     certIssuedHeading: "የምስክር ወረቀት ተሰጥቷል",
     viewPrintCertificate: "የምስክር ወረቀት ይመልከቱ / አትም",
-    certSentToUser: "የምስክር ወረቀቱ ለተጠቃሚው ተልኳል",
-    certSentToUserHint: "የምስክር ወረቀቱ በአስተዳዳሪው ሲፀድቅ በቀጥታ ለአመልካቹ ኢሜይል ተልኳል።",
+    certSentToUser: "የምስክር ወረቀቱ ለተጠቃሚው ደርሷል",
+    certSentToUserHint: "የምስክር ወረቀቱ በአመልካቹ ገጽ ላይ ይገኛል።",
 
 
     tab_account: "መለያ",

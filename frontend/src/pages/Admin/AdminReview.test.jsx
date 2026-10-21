@@ -149,7 +149,7 @@ describe("AdminReview Component Unit Tests", () => {
     fireEvent.click(printBtn);
     expect(mockNavigate).toHaveBeenCalledWith("/admin/certificate/APP-888/print");
 
-    expect(screen.getByText(/Certificate sent to user/i)).toBeInTheDocument();
+    expect(screen.getByText(/Certificate directed to user/i)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Send to Applicant/i })).not.toBeInTheDocument();
   });
 });

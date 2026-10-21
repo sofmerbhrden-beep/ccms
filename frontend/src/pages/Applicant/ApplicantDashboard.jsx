@@ -231,8 +231,8 @@ export default function ApplicantDashboard() {
                             </p>
                             <p className="text-xs text-gray-700 mt-0.5 font-medium">
                               {lang === "am"
-                                ? "የእርስዎ ይፋዊ የምስክር ወረቀት ተዘጋጅቶ በኢሜይል አድራሻዎ ተላኳል።"
-                                : "Your official certificate has been generated and sent to your registered email address."}
+                                ? "የእርስዎ ይፋዊ የምስክር ወረቀት ተዘጋጅቷል። ከታች ማየት እና ማውረድ ይችላሉ።"
+                                : "Your official certificate has been generated. You can view and download it below."}
                             </p>
                           </div>
                         </div>
