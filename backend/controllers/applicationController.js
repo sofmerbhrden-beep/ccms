@@ -901,6 +901,9 @@ export async function importLegacyApplication(req, res, next) {
       await app.save();
     } catch (pdfErr) {
       console.error("Legacy PDF generation failed:", pdfErr);
+      throw new Error(
+        `Certificate PDF generation failed: ${pdfErr instanceof Error ? pdfErr.message : String(pdfErr)}`
+      );
     }
 
     await updateReferenceNumberCounter(referenceNumber);
