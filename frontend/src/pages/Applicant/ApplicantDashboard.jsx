@@ -1,10 +1,13 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { PlusCircle, FileText, CheckCircle, ShieldCheck, CheckCircle2, ArrowRight } from "lucide-react";
+import { PlusCircle, FileText, CheckCircle, ShieldCheck, CheckCircle2, ArrowRight, Eye, Download, Printer } from "lucide-react";
 import AdminStatusPill from "../../components/AdminStatusPill.jsx";
+import CertificateModal from "../../components/CertificateModal.jsx";
 import { useAppData } from "@/hooks/useAppData.js";
 import { useLanguage } from "@/hooks/useLanguage.js";
 import { useAuth } from "@/hooks/useAuth.js";
 import { formatEthDate } from "@/utils/ethDate.js";
+import { api } from "@/services/api.js";
 
 function ApplicationProgressTracker({ status }) {
   const isRejected = status.includes("rejected");
@@ -68,6 +71,27 @@ export default function ApplicantDashboard() {
   const userName = user?.fullName || user?.name || user?.username || "";
 
   const mine = applications;
+
+  const [previewApp, setPreviewApp] = useState(null);
+  const [printApp, setPrintApp] = useState(null);
+  const [downloadingId, setDownloadingId] = useState(null);
+  const [downloadError, setDownloadError] = useState(null);
+
+  async function handleDownload(app) {
+    setDownloadingId(app.id);
+    setDownloadError(null);
+    try {
+      await api.downloadCertificatePdf(app.id);
+    } catch (err) {
+      setDownloadError({
+        appId: app.id,
+        message:
+          err?.message || (lang === "am" ? "ፍቃዱን ማውረድ አልተቻለም።" : "Could not download the certificate."),
+      });
+    } finally {
+      setDownloadingId(null);
+    }
+  }
 
   return (
     <div className="max-w-[880px] mx-auto py-6 sm:py-8 px-4 sm:px-6">
@@ -214,12 +238,50 @@ export default function ApplicantDashboard() {
                         </div>
                       </div>
                     )}
+
+                    {a.certificate?.pdfAvailable && (
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <button
+                          onClick={() => setPreviewApp(a)}
+                          className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-white bg-[#1B2A4A] hover:bg-[#22355c] active:scale-[0.98] px-4 py-2.5 rounded-lg shadow-md transition-all duration-150 cursor-pointer"
+                        >
+                          <Eye size={14} /> {t("certificatePreview")}
+                        </button>
+                        <button
+                          onClick={() => handleDownload(a)}
+                          disabled={downloadingId === a.id}
+                          className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-white bg-[#3C8DBC] hover:bg-[#357ca5] active:scale-[0.98] disabled:opacity-60 px-4 py-2.5 rounded-lg shadow-md transition-all duration-150 cursor-pointer"
+                        >
+                          <Download size={14} />
+                          {downloadingId === a.id ? t("certificateDownloading") : t("certificateDownload")}
+                        </button>
+                        <button
+                          onClick={() => setPrintApp(a)}
+                          className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-800 bg-white border border-gray-300 hover:bg-gray-50 active:scale-[0.98] px-4 py-2.5 rounded-lg shadow-sm transition-all duration-150 cursor-pointer"
+                        >
+                          <Printer size={14} /> {t("certificatePrint")}
+                        </button>
+                      </div>
+                    )}
+
+                    {downloadError?.appId === a.id && (
+                      <p className="mt-2 text-xs font-semibold text-rose-700" role="alert">
+                        {downloadError.message}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
             );
           })}
         </div>
+      )}
+
+      {previewApp && (
+        <CertificateModal app={previewApp} onClose={() => setPreviewApp(null)} />
+      )}
+      {printApp && (
+        <CertificateModal app={printApp} onClose={() => setPrintApp(null)} printOnOpen />
       )}
 
     </div>

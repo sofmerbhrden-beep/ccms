@@ -8,6 +8,7 @@ import {
   getDecisions,
   createCertificate,
   sendCertificateEmail,
+  downloadCertificatePdf,
   renewalLookup,
   importLegacyApplication,
 } from "../controllers/applicationController.js";
@@ -55,5 +56,10 @@ router
   .route("/:id/certificate/send")
   .post(requireRole("admin"), sendCertificateEmail)
   .all(methodNotAllowed("POST"));
+
+router
+  .route("/:id/certificate/pdf")
+  .get(downloadCertificatePdf)
+  .all(methodNotAllowed("GET"));
 
 export default router;

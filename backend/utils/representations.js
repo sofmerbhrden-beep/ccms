@@ -1,3 +1,5 @@
+import { resolveCertificatePdfPath } from "./certificateFiles.js";
+
 export const API_ROOT = "/api/v1";
 
 function link(href, method) {
@@ -76,17 +78,22 @@ export function applicationRepresentation(app, { requester } = {}) {
     const histObj = app.certificate.history?.toObject
       ? app.certificate.history.toObject()
       : app.certificate.history || {};
+    const pdfAvailable = !!resolveCertificatePdfPath(app);
     certRep = {
       referenceNumber: app.certificate.referenceNumber,
       latestYear: app.certificate.latestYear,
       issuedAt: app.certificate.issuedAt,
       adminName: app.certificate.adminName,
+      pdfAvailable,
       history: Object.fromEntries(
         Object.entries(histObj).map(([y, v]) => [
           y,
           { issuedAt: v.issuedAt, adminName: v.adminName },
         ]),
       ),
+      _links: pdfAvailable
+        ? { download: link(`${API_ROOT}/applications/${app.appId}/certificate/pdf`) }
+        : {},
     };
   }
 

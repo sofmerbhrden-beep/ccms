@@ -174,6 +174,10 @@ export const translations = {
     startApplication: "Start an application",
     staffFeedback: "Staff feedback",
     adminFeedback: "Admin feedback",
+    certificatePreview: "Preview certificate",
+    certificateDownload: "Download PDF",
+    certificateDownloading: "Downloading…",
+    certificatePrint: "Print certificate",
     referenceNo: "Reference No.",
     submitted: "submitted",
 
@@ -493,6 +497,10 @@ export const translations = {
     startApplication: "ማመልከቻ ጀምር",
     staffFeedback: "የሰራተኛ አስተያየት",
     adminFeedback: "የአስተዳዳሪ አስተያየት",
+    certificatePreview: "ፈቃዱን አሳየት",
+    certificateDownload: "PDF አውርድ",
+    certificateDownloading: "በመውረድ ላይ…",
+    certificatePrint: "ፈቃዱን አትም",
     referenceNo: "የማጣቀሻ ቁጥር",
     submitted: "ገብቷል",
 

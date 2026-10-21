@@ -1,14 +1,35 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import { createPortal } from "react-dom";
-import { X, FileCheck2 } from "lucide-react";
+import { X, FileCheck2, Download } from "lucide-react";
 import CertificatePreview from "./CertificatePreview.jsx";
 import { Button } from "./ui/button.jsx";
+import { api } from "../services/api.js";
 
 export default function CertificateModal({ app, onClose, printOnOpen = false }) {
   const printAreaRef = useRef(null);
   const history = app?.certificate?.history || {};
   const years = Object.keys(history).sort((a, b) => Number(b) - Number(a));
-  const [selectedYear, setSelectedYear] = useState(app?.certificate?.latestYear || years[0]);
+  const initialYear = Number(app?.certificate?.latestYear ?? years[0]);
+  const [selectedYear, setSelectedYear] = useState(
+    Number.isFinite(initialYear) ? initialYear : null,
+  );
+  const [downloading, setDownloading] = useState(false);
+  const [downloadError, setDownloadError] = useState("");
+
+  const handleDownload = useCallback(async () => {
+    if (!app?.id) return;
+    setDownloading(true);
+    setDownloadError("");
+    try {
+      await api.downloadCertificatePdf(app.id, { year: selectedYear });
+    } catch (err) {
+      setDownloadError(
+        err?.message || "Could not download the certificate PDF.",
+      );
+    } finally {
+      setDownloading(false);
+    }
+  }, [app, selectedYear]);
 
   const doPrint = useCallback(() => {
     const el = printAreaRef.current;
@@ -88,7 +109,7 @@ export default function CertificateModal({ app, onClose, printOnOpen = false }) 
                   {years.map((y) => (
                     <button
                       key={y}
-                      onClick={() => setSelectedYear(y)}
+                      onClick={() => setSelectedYear(Number(y))}
                       className={`font-mono text-[10px] px-2.5 py-1 rounded border transition-colors ${
                         String(selectedYear) === String(y)
                           ? "bg-[#5865f2] text-white border-[#5865f2]"
@@ -102,6 +123,16 @@ export default function CertificateModal({ app, onClose, printOnOpen = false }) 
               </div>
             )}
             <Button
+              onClick={handleDownload}
+              disabled={downloading}
+              variant="ghost"
+              size="sm"
+              className="font-mono text-[11px] uppercase tracking-[0.1em] text-[#949ba4] hover:text-white hover:bg-paper-card/10"
+            >
+              <Download size={15} className="mr-1.5" />
+              {downloading ? "Downloading…" : "Download PDF"}
+            </Button>
+            <Button
               onClick={onClose}
               variant="ghost"
               size="icon"
@@ -112,6 +143,12 @@ export default function CertificateModal({ app, onClose, printOnOpen = false }) 
             </Button>
           </div>
         </div>
+
+        {downloadError && (
+          <p className="mb-3 text-xs font-semibold text-rose-300" role="alert">
+            {downloadError}
+          </p>
+        )}
 
         <div className="bg-[#2b2d31] border border-[#1e1f22] rounded-lg p-6 sm:p-10 shadow-2xl">
           <div ref={printAreaRef}>

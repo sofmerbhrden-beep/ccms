@@ -17,6 +17,7 @@ import settingsRoutes from "./routes/settingsRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 import { protect } from "./middleware/authMiddleware.js";
+import { blockCertificatePdfStaticAccess } from "./middleware/certificateStaticGuard.js";
 import { API_ROOT } from "./utils/representations.js";
 
 export const sseClients = new Map();
@@ -63,6 +64,7 @@ app.use(cookieParser());
 app.use(
   "/uploads",
   protect,
+  blockCertificatePdfStaticAccess,
   express.static(path.join(__dirname, "uploads"), {
     immutable: true,
     maxAge: "1d",

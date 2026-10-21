@@ -69,6 +69,44 @@ export function follow(link, { body } = {}) {
   return request(path, { method: link.method || "GET", body });
 }
 
+export async function downloadCertificatePdf(id, { year } = {}) {
+  const path = `/applications/${encodeURIComponent(id)}/certificate/pdf${
+    year ? `?year=${encodeURIComponent(year)}` : ""
+  }`;
+  const res = await fetch(`${API_ROOT}${path}`, {
+    method: "GET",
+    credentials: "include",
+    headers: { Accept: "application/pdf" },
+  });
+
+  if (!res.ok) {
+    let message = `Request failed (${res.status})`;
+    try {
+      const data = await res.json();
+      message = data?.message || message;
+    } catch {
+      // non-JSON error body
+    }
+    throw new ApiError(res.status, message);
+  }
+
+  const blob = await res.blob();
+  const disposition = res.headers.get("Content-Disposition") || "";
+  const match = /filename="?([^"]+)"?/.exec(disposition);
+  const filename = match?.[1] || `certificate-${id}${year ? `-${year}` : ""}.pdf`;
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+
+  return { filename, size: blob.size };
+}
+
 export const api = {
 
   login: (email, password) =>
@@ -176,6 +214,7 @@ export const api = {
     request(`/applications/${encodeURIComponent(id)}/certificate/send`, {
       method: "POST",
     }),
+  downloadCertificatePdf: (id, opts) => downloadCertificatePdf(id, opts),
 
 
   verifyCertificate: (refNumber) => {

@@ -11,6 +11,10 @@ import {
 } from "../utils/referenceNumber.js";
 import { generateCertificatePdf } from "../utils/generateCertificatePdf.js";
 import {
+  resolveCertificatePdfPath,
+  certificatePdfAbsolutePath,
+} from "../utils/certificateFiles.js";
+import {
   applicationRepresentation,
   certificateRepresentation,
   certificateSelfHref,
@@ -641,6 +645,56 @@ export async function getCertificate(req, res, next) {
 
     res.set("Cache-Control", "public, max-age=3600");
     res.json(certificateRepresentation(app));
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function downloadCertificatePdf(req, res, next) {
+  try {
+    const app = await Application.findOne({ appId: req.params.id });
+    if (!app) {
+      return res.status(404).json({ message: "Application not found" });
+    }
+
+    if (req.user.role === "applicant" && !app.applicant.equals(req.user._id)) {
+      return res
+        .status(404)
+        .json({ message: "Application not found" });
+    }
+
+    if (
+      !["certificate_generated", "expired"].includes(app.status) ||
+      !app.certificate?.referenceNumber
+    ) {
+      return res
+        .status(409)
+        .json({ message: "Certificate has not been issued yet" });
+    }
+
+    const year = req.query.year ? parseInt(req.query.year, 10) : null;
+    const relativePath = resolveCertificatePdfPath(app, Number.isFinite(year) ? year : null);
+    if (!relativePath) {
+      return res
+        .status(404)
+        .json({ message: "Certificate PDF is not available" });
+    }
+
+    const absolutePath = certificatePdfAbsolutePath(relativePath);
+    if (!absolutePath) {
+      return res
+        .status(404)
+        .json({ message: "Certificate PDF is not available" });
+    }
+
+    const filename = path.basename(absolutePath);
+    res.set({
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `attachment; filename="${filename}"`,
+      "Cache-Control": "private, no-store",
+      "X-Content-Type-Options": "nosniff",
+    });
+    res.sendFile(absolutePath);
   } catch (err) {
     next(err);
   }
