@@ -5,7 +5,7 @@ import CertificatePreview from "./CertificatePreview.jsx";
 import { Button } from "./ui/button.jsx";
 import { api } from "../services/api.js";
 
-export default function CertificateModal({ app, onClose, printOnOpen = false }) {
+export default function CertificateModal({ app, onClose, printOnOpen = false, pdfAvailable = false }) {
   const printAreaRef = useRef(null);
   const history = app?.certificate?.history || {};
   const years = Object.keys(history).sort((a, b) => Number(b) - Number(a));
@@ -122,16 +122,18 @@ export default function CertificateModal({ app, onClose, printOnOpen = false }) 
                 </div>
               </div>
             )}
-            <Button
-              onClick={handleDownload}
-              disabled={downloading}
-              variant="ghost"
-              size="sm"
-              className="font-mono text-[11px] uppercase tracking-[0.1em] text-[#949ba4] hover:text-white hover:bg-paper-card/10"
-            >
-              <Download size={15} className="mr-1.5" />
-              {downloading ? "Downloading…" : "Download PDF"}
-            </Button>
+            {pdfAvailable && (
+              <Button
+                onClick={handleDownload}
+                disabled={downloading}
+                variant="ghost"
+                size="sm"
+                className="font-mono text-[11px] uppercase tracking-[0.1em] text-[#949ba4] hover:text-white hover:bg-paper-card/10"
+              >
+                <Download size={15} className="mr-1.5" />
+                {downloading ? "Downloading…" : "Download PDF"}
+              </Button>
+            )}
             <Button
               onClick={onClose}
               variant="ghost"

@@ -77,9 +77,9 @@ describe("ApplicantDashboard certificate actions", () => {
   it("shows preview, download and print buttons when a certificate PDF is available", () => {
     renderWithProviders(<ApplicantDashboard />);
 
-    expect(screen.getByRole("button", { name: /Preview certificate/i })).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: /Preview certificate/i })[0]).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Download PDF/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Print certificate/i })).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: /Print certificate/i })[0]).toBeInTheDocument();
   });
 
   it("hides certificate actions when no PDF is available", () => {
@@ -138,7 +138,7 @@ describe("ApplicantDashboard certificate actions", () => {
 
     expect(screen.queryByTestId("certificate-modal")).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: /Preview certificate/i }));
+    fireEvent.click(screen.getAllByRole("button", { name: /Preview certificate/i })[0]);
 
     expect(screen.getByTestId("certificate-modal")).toBeInTheDocument();
     expect(screen.getByTestId("certificate-modal")).toHaveTextContent("APP-5003");
@@ -147,7 +147,7 @@ describe("ApplicantDashboard certificate actions", () => {
   it("opens the certificate modal in print mode when printing", () => {
     renderWithProviders(<ApplicantDashboard />);
 
-    fireEvent.click(screen.getByRole("button", { name: /Print certificate/i }));
+    fireEvent.click(screen.getAllByRole("button", { name: /Print certificate/i })[0]);
 
     const modal = screen.getByTestId("certificate-modal");
     expect(modal).toHaveAttribute("data-print", "true");
@@ -156,7 +156,7 @@ describe("ApplicantDashboard certificate actions", () => {
   it("closes the certificate modal", () => {
     renderWithProviders(<ApplicantDashboard />);
 
-    fireEvent.click(screen.getByRole("button", { name: /Preview certificate/i }));
+    fireEvent.click(screen.getAllByRole("button", { name: /Preview certificate/i })[0]);
     fireEvent.click(screen.getByRole("button", { name: /Close modal/i }));
 
     expect(screen.queryByTestId("certificate-modal")).not.toBeInTheDocument();

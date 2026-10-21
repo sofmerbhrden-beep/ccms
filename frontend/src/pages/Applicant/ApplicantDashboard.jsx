@@ -239,7 +239,7 @@ export default function ApplicantDashboard() {
                       </div>
                     )}
 
-                    {a.certificate?.pdfAvailable && (
+                    {a.certificate?.referenceNumber && (
                       <div className="mt-3 flex flex-wrap items-center gap-2">
                         <button
                           onClick={() => setPreviewApp(a)}
@@ -247,14 +247,16 @@ export default function ApplicantDashboard() {
                         >
                           <Eye size={14} /> {t("certificatePreview")}
                         </button>
-                        <button
-                          onClick={() => handleDownload(a)}
-                          disabled={downloadingId === a.id}
-                          className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-white bg-[#3C8DBC] hover:bg-[#357ca5] active:scale-[0.98] disabled:opacity-60 px-4 py-2.5 rounded-lg shadow-md transition-all duration-150 cursor-pointer"
-                        >
-                          <Download size={14} />
-                          {downloadingId === a.id ? t("certificateDownloading") : t("certificateDownload")}
-                        </button>
+                        {a.certificate?.pdfAvailable && (
+                          <button
+                            onClick={() => handleDownload(a)}
+                            disabled={downloadingId === a.id}
+                            className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-white bg-[#3C8DBC] hover:bg-[#357ca5] active:scale-[0.98] disabled:opacity-60 px-4 py-2.5 rounded-lg shadow-md transition-all duration-150 cursor-pointer"
+                          >
+                            <Download size={14} />
+                            {downloadingId === a.id ? t("certificateDownloading") : t("certificateDownload")}
+                          </button>
+                        )}
                         <button
                           onClick={() => setPrintApp(a)}
                           className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-800 bg-white border border-gray-300 hover:bg-gray-50 active:scale-[0.98] px-4 py-2.5 rounded-lg shadow-sm transition-all duration-150 cursor-pointer"
@@ -278,10 +280,10 @@ export default function ApplicantDashboard() {
       )}
 
       {previewApp && (
-        <CertificateModal app={previewApp} onClose={() => setPreviewApp(null)} />
+        <CertificateModal app={previewApp} onClose={() => setPreviewApp(null)} pdfAvailable={previewApp.certificate?.pdfAvailable} />
       )}
       {printApp && (
-        <CertificateModal app={printApp} onClose={() => setPrintApp(null)} printOnOpen />
+        <CertificateModal app={printApp} onClose={() => setPrintApp(null)} printOnOpen pdfAvailable={printApp.certificate?.pdfAvailable} />
       )}
 
     </div>

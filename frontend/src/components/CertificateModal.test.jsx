@@ -36,7 +36,7 @@ describe("CertificateModal", () => {
   });
 
   it("downloads the PDF for the currently selected year", async () => {
-    render(<CertificateModal app={app} onClose={() => {}} />);
+    render(<CertificateModal app={app} onClose={() => {}} pdfAvailable={true} />);
 
     expect(screen.getByText("Preview for 2018")).toBeInTheDocument();
 
@@ -47,7 +47,7 @@ describe("CertificateModal", () => {
   });
 
   it("downloads a historical year PDF after switching versions", async () => {
-    render(<CertificateModal app={app} onClose={() => {}} />);
+    render(<CertificateModal app={app} onClose={() => {}} pdfAvailable={true} />);
 
     fireEvent.click(screen.getByRole("button", { name: "2017" }));
     expect(screen.getByText("Preview for 2017")).toBeInTheDocument();
@@ -61,7 +61,7 @@ describe("CertificateModal", () => {
   it("shows an error when the download fails", async () => {
     mockDownloadCertificatePdf.mockRejectedValueOnce(new Error("Certificate PDF is not available"));
 
-    render(<CertificateModal app={app} onClose={() => {}} />);
+    render(<CertificateModal app={app} onClose={() => {}} pdfAvailable={true} />);
     fireEvent.click(screen.getByRole("button", { name: /Download PDF/i }));
 
     await waitFor(() => {
