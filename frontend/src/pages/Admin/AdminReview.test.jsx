@@ -128,7 +128,7 @@ describe("AdminReview Component Unit Tests", () => {
     expect(mockGenerateCertificate).toHaveBeenCalledWith("APP-777");
   });
 
-  it("renders print and email dispatch options when certificate is generated", async () => {
+  it("renders print option and certificate sent notification when certificate is generated", async () => {
     mockGetById.mockReturnValue({
       id: "APP-888",
       status: "certificate_generated",
@@ -149,11 +149,7 @@ describe("AdminReview Component Unit Tests", () => {
     fireEvent.click(printBtn);
     expect(mockNavigate).toHaveBeenCalledWith("/admin/certificate/APP-888/print");
 
-    const sendBtn = screen.getByRole("button", { name: /Send to Applicant/i });
-    fireEvent.click(sendBtn);
-
-    await waitFor(() => {
-      expect(screen.getByRole("button", { name: /Send to Applicant/i })).toBeInTheDocument();
-    });
+    expect(screen.getByText(/Certificate sent to user/i)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Send to Applicant/i })).not.toBeInTheDocument();
   });
 });

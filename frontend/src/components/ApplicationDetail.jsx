@@ -23,9 +23,14 @@ function DocViewer({ label, doc }) {
   const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(doc.name || "") || /\.(jpg|jpeg|png|gif|webp)$/i.test(doc.url || "");
   const isPdf = /\.pdf$/i.test(doc.name || "") || /\.pdf$/i.test(doc.url || "");
 
-  const baseUrl = import.meta.env.VITE_API_URL
-    ? import.meta.env.VITE_API_URL.replace(/\/api\/?$/, "")
-    : "";
+  const getBaseUrl = () => {
+    try {
+      return Function("return typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace(/\\/api\\/?$/, '') : ''")();
+    } catch {
+      return "";
+    }
+  };
+  const baseUrl = getBaseUrl();
   const fileUrl = doc.url?.startsWith("/uploads/")
     ? `${baseUrl}${doc.url}`
     : doc.url;

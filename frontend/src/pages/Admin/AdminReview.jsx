@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, CheckCircle2, XCircle, X, Award, Send, Eye, Printer, RefreshCw, Edit } from "lucide-react";
+import { ArrowLeft, CheckCircle2, XCircle, X, Award, Eye, Printer, RefreshCw, Edit } from "lucide-react";
 import { toast } from "sonner";
 import ApplicationDetail from "../../components/ApplicationDetail.jsx";
 import EditApplicationModal from "../../components/EditApplicationModal.jsx";
 import { useAppData } from "@/hooks/useAppData.js";
 import { useLanguage } from "@/hooks/useLanguage.js";
-import { api } from "@/services/api.js";
 
 export default function AdminReview() {
   const { id } = useParams();
@@ -18,7 +17,6 @@ export default function AdminReview() {
   const [reason, setReason] = useState("");
   const [showReject, setShowReject] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
-  const [sending, setSending] = useState(false);
 
   if (!app) {
     return (
@@ -63,18 +61,6 @@ export default function AdminReview() {
       await generateCertificate(app.id);
     } catch (err) {
       toast.error(err.message);
-    }
-  }
-
-  async function handleSendCertificate() {
-    setSending(true);
-    try {
-      await api.sendCertificate(app.id);
-      toast.success("Certificate sent to applicant's email.");
-    } catch (err) {
-      toast.error(err.message);
-    } finally {
-      setSending(false);
     }
   }
 
@@ -190,21 +176,24 @@ export default function AdminReview() {
                 {app.certificate.referenceNumber}
               </span>
             </div>
-            <div className="flex flex-col gap-2.5">
+            <div className="flex flex-col gap-3">
               <button
                 onClick={() => navigate(`/admin/certificate/${app.id}/print`)}
                 className="w-full flex items-center justify-center gap-2 bg-[#1B2A4A] hover:bg-[#22355c] active:scale-[0.98] text-white font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-lg transition-all duration-150 cursor-pointer shadow-md hover:shadow-lg"
               >
                 <Printer size={16} /> Print Certificate
               </button>
-              <button
-                onClick={handleSendCertificate}
-                disabled={sending}
-                className="w-full flex items-center justify-center gap-2 bg-[#3C8DBC] hover:bg-[#357ca5] active:scale-[0.98] disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-lg transition-all duration-150 cursor-pointer shadow-md hover:shadow-lg"
-              >
-                <Send size={16} />
-                {sending ? "Sending Email…" : "Send to Applicant"}
-              </button>
+              <div className="flex items-center gap-2.5 bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-emerald-800 shadow-xs">
+                <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+                <div className="text-xs">
+                  <p className="font-bold text-emerald-900">
+                    {t("certSentToUser")}
+                  </p>
+                  <p className="text-emerald-700 text-[11px] mt-0.5 font-medium">
+                    {t("certSentToUserHint")}
+                  </p>
+                </div>
+              </div>
             </div>
           </section>
         )}
